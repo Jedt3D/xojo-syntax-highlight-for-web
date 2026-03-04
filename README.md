@@ -21,6 +21,14 @@ This project provides a syntax highlighting solution for Xojo web applications. 
 
 ## Quick Start Guides
 
+### Python Simple Web Server
+
+0. If you have Python3, you may use this command to run a simple http web server from the git repo's directory.
+```bash
+python3 -m http.server
+```
+Then open your browser and go to `http://localhost:8000/prismjs/demo/index.html`, for example.
+
 ### Library 1: Highlight.js
 1. Install Highlight.js from npm:
    ```bash
