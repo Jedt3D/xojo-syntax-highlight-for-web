@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xojo · highlight.js Demo</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+  <script type="module">
+    import xojo from '../xojo.highlight.js';
+    hljs.registerLanguage('xojo', xojo);
+    document.querySelectorAll('code.xojo').forEach(el => {
+      const result = hljs.highlight(el.textContent, { language: 'xojo' });
+      el.innerHTML = result.value;
+      el.classList.add('hljs');
+    });
+    // Also highlight usage snippets
+    document.querySelectorAll('code.html-snippet').forEach(el => {
+      const result = hljs.highlight(el.textContent, { language: 'html' });
+      el.innerHTML = result.value;
+      el.classList.add('hljs');
+    });
+    document.querySelectorAll('code.js-snippet').forEach(el => {
+      const result = hljs.highlight(el.textContent, { language: 'javascript' });
+      el.innerHTML = result.value;
+      el.classList.add('hljs');
+    });
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0d1117;
+      color: #c9d1d9;
+      padding: 2.5rem 2rem;
+      line-height: 1.6;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: 0.4rem;
+    }
+
+    h1 { font-size: 1.8rem; color: #f0f6fc; }
+
+    .lib-badge {
+      font-size: 0.8rem;
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 20px;
+      padding: 3px 12px;
+      color: #8b949e;
+    }
+
+    .subtitle {
+      color: #8b949e;
+      font-size: 0.9rem;
+      margin-bottom: 2.5rem;
+    }
+
+    h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #8b949e;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin: 2.5rem 0 0.85rem;
+    }
+
+    h2:first-of-type { margin-top: 0; }
+
+    pre {
+      border-radius: 8px;
+      overflow: auto;
+      font-size: 0.85rem;
+      line-height: 1.65;
+    }
+
+    /* Override hljs padding for inline usage blocks */
+    .usage-block pre {
+      background: #161b22;
+      border: 1px solid #30363d;
+    }
+
+    .token-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 0.5rem;
+    }
+
+    .token-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-radius: 6px;
+      padding: 0.45rem 0.75rem;
+      font-size: 0.82rem;
+    }
+
+    .token-row .swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .token-row .label { color: #8b949e; }
+    .token-row .examples { color: #c9d1d9; font-family: monospace; }
+
+    .sw-keyword  { background: #c678dd; }
+    .sw-literal  { background: #d19a66; }
+    .sw-type     { background: #56b6c2; }
+    .sw-builtin  { background: #e06c75; }
+    .sw-comment  { background: #5c6370; }
+    .sw-string   { background: #98c379; }
+    .sw-number   { background: #d19a66; }
+    .sw-meta     { background: #e5c07b; }
+  </style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Xojo Syntax Highlighting</h1>
+  <span class="lib-badge">highlight.js</span>
+</div>
+<p class="subtitle">Language definition — register once, use with any highlight.js theme.</p>
+
+<h2>Live Preview</h2>
+<pre><code class="xojo">// Fibonacci — Xojo syntax demo
+' Apostrophe comments work too
+
+#pragma DisableBackgroundTasks
+#tag Module, Name = MathUtils
+
+Function Fibonacci(n As Integer) As Integer
+  If n &lt;= 1 Then Return n
+  Return Fibonacci(n - 1) + Fibonacci(n - 2)
+End Function
+
+#tag EndModule
+
+Class MyWindow
+  Inherits DesktopWindow
+
+  Property Title As String = "My App"
+
+  Sub Opening()
+    Var btn As New DesktopButton
+    btn.Caption = "Click Me"
+    btn.Left = 20
+    btn.Top = 20
+
+    Var mask  As Integer = &hFF00FF    // hex literal
+    Var flags As Integer = &b10101010  // binary literal
+    Var pi    As Double  = 3.14159
+
+    If mask = Nil Or flags = 0 Then
+      Raise New RuntimeException("Error")
+    End If
+
+    AddHandler btn.Pressed, AddressOf ButtonPressed
+  End Sub
+
+  Sub ButtonPressed(sender As DesktopButton)
+    Self.Title = "Clicked!"
+  End Sub
+
+End Class</code></pre>
+
+<h2>Token Coverage</h2>
+<div class="token-grid">
+  <div class="token-row"><span class="swatch sw-keyword"></span><span class="label">keyword</span><span class="examples">Var Sub If Return…</span></div>
+  <div class="token-row"><span class="swatch sw-literal"></span><span class="label">literal</span><span class="examples">True False Nil</span></div>
+  <div class="token-row"><span class="swatch sw-type"></span><span class="label">type</span><span class="examples">Integer String Double…</span></div>
+  <div class="token-row"><span class="swatch sw-builtin"></span><span class="label">built_in</span><span class="examples">Self Super Me</span></div>
+  <div class="token-row"><span class="swatch sw-comment"></span><span class="label">comment</span><span class="examples">// line  ' apostrophe</span></div>
+  <div class="token-row"><span class="swatch sw-string"></span><span class="label">string</span><span class="examples">"double quoted"</span></div>
+  <div class="token-row"><span class="swatch sw-number"></span><span class="label">number</span><span class="examples">42  3.14  &amp;hFF  &amp;b1010</span></div>
+  <div class="token-row"><span class="swatch sw-meta"></span><span class="label">meta</span><span class="examples">#pragma #tag #if #endif</span></div>
+</div>
+
+<h2>Usage</h2>
+<div class="usage-block">
+  <p style="color:#8b949e;font-size:.85rem;margin-bottom:.5rem;">1. Load highlight.js, import the grammar, register and call highlightAll:</p>
+  <pre><code class="html-snippet">&lt;link rel="stylesheet" href="atom-one-dark.min.css"&gt;
+&lt;script src="highlight.min.js"&gt;&lt;/script&gt;
+&lt;script type="module"&gt;
+  import xojo from './xojo.highlight.js';
+  hljs.registerLanguage('xojo', xojo);
+  hljs.highlightAll();
+&lt;/script&gt;</code></pre>
+
+  <p style="color:#8b949e;font-size:.85rem;margin:.85rem 0 .5rem;">2. Mark up code blocks with <code style="color:#c9d1d9">language-xojo</code>:</p>
+  <pre><code class="html-snippet">&lt;pre&gt;&lt;code class="language-xojo"&gt;
+  Var greeting As String = "Hello, World!"
+&lt;/code&gt;&lt;/pre&gt;</code></pre>
+
+  <p style="color:#8b949e;font-size:.85rem;margin:.85rem 0 .5rem;">3. Or in Markdown (markdown-it, marked, etc.):</p>
+  <pre><code class="js-snippet">```xojo
+Var greeting As String = "Hello, World!"
+```</code></pre>
+</div>
+
+</body>
+</html>

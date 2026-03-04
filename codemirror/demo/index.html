@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xojo · CodeMirror 6 Demo</title>
+
+  <!--
+    Import map with '*' prefix: esm.sh serves each package in "external" mode,
+    meaning ALL their imports use bare specifiers resolved through this map.
+    This guarantees every package shares the EXACT same @codemirror/state instance.
+    All transitive deps must be listed — missing any one causes a silent load failure.
+  -->
+  <script type="importmap">
+  {
+    "imports": {
+      "codemirror":                   "https://esm.sh/*codemirror@6.0.2",
+      "@codemirror/autocomplete":     "https://esm.sh/*@codemirror/autocomplete@6",
+      "@codemirror/commands":         "https://esm.sh/*@codemirror/commands@6",
+      "@codemirror/language":         "https://esm.sh/*@codemirror/language@6",
+      "@codemirror/lint":             "https://esm.sh/*@codemirror/lint@6",
+      "@codemirror/search":           "https://esm.sh/*@codemirror/search@6",
+      "@codemirror/state":            "https://esm.sh/*@codemirror/state@6",
+      "@codemirror/view":             "https://esm.sh/*@codemirror/view@6",
+      "@codemirror/theme-one-dark":   "https://esm.sh/*@codemirror/theme-one-dark@6",
+      "@lezer/common":                "https://esm.sh/*@lezer/common@1",
+      "@lezer/highlight":             "https://esm.sh/*@lezer/highlight@1",
+      "@lezer/lr":                    "https://esm.sh/*@lezer/lr@1",
+      "crelt":                        "https://esm.sh/*crelt",
+      "style-mod":                    "https://esm.sh/*style-mod",
+      "w3c-keyname":                  "https://esm.sh/*w3c-keyname",
+      "@marijn/find-cluster-break":   "https://esm.sh/*@marijn/find-cluster-break"
+    }
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0d1117;
+      color: #c9d1d9;
+      padding: 2.5rem 2rem;
+      line-height: 1.6;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: 0.4rem;
+    }
+
+    h1 { font-size: 1.8rem; color: #f0f6fc; }
+
+    .lib-badge {
+      font-size: 0.8rem;
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 20px;
+      padding: 3px 12px;
+      color: #8b949e;
+    }
+
+    .subtitle {
+      color: #8b949e;
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+    }
+
+    h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #8b949e;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin: 2.5rem 0 0.85rem;
+    }
+
+    h2:first-of-type { margin-top: 0; }
+
+    /* CodeMirror container */
+    #editor {
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #30363d;
+      font-size: 0.88rem;
+    }
+
+    /* Override CM6 One Dark background to match page */
+    #editor .cm-editor { border-radius: 8px; }
+    #editor .cm-scroller { max-height: 520px; }
+
+    .token-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 0.5rem;
+    }
+
+    .token-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-radius: 6px;
+      padding: 0.45rem 0.75rem;
+      font-size: 0.82rem;
+    }
+
+    .token-row .swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .token-row .label   { color: #8b949e; min-width: 5rem; }
+    .token-row .examples { color: #c9d1d9; font-family: monospace; }
+
+    /* One Dark token colours (approximate) */
+    .sw-keyword  { background: #c678dd; }
+    .sw-atom     { background: #d19a66; }
+    .sw-type     { background: #56b6c2; }
+    .sw-builtin  { background: #e06c75; }
+    .sw-comment  { background: #5c6370; }
+    .sw-string   { background: #98c379; }
+    .sw-number   { background: #d19a66; }
+    .sw-meta     { background: #e5c07b; }
+
+    .usage-block {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+
+    .usage-block pre {
+      background: #0d1117;
+      border: 1px solid #21262d;
+      border-radius: 6px;
+      padding: 1rem 1.25rem;
+      overflow: auto;
+      font-size: 0.82rem;
+      line-height: 1.65;
+      color: #cdd6f4;
+      font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    }
+
+    .usage-block p {
+      color: #8b949e;
+      font-size: .85rem;
+      margin: 1rem 0 .5rem;
+    }
+
+    .usage-block p:first-child { margin-top: 0; }
+
+    #loading {
+      color: #8b949e;
+      font-size: 0.9rem;
+      padding: 2rem;
+      text-align: center;
+      background: #161b22;
+      border-radius: 8px;
+      border: 1px solid #30363d;
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Xojo Syntax Highlighting</h1>
+  <span class="lib-badge">CodeMirror 6</span>
+</div>
+<p class="subtitle">StreamLanguage definition — fully editable, works with any CodeMirror 6 theme.</p>
+
+<h2>Live Editor</h2>
+<div id="loading">Loading CodeMirror…</div>
+<div id="editor" style="display:none"></div>
+
+<h2>Token Coverage</h2>
+<div class="token-grid">
+  <div class="token-row"><span class="swatch sw-keyword"></span><span class="label">keyword</span><span class="examples">Var Sub If Return…</span></div>
+  <div class="token-row"><span class="swatch sw-atom"></span><span class="label">atom</span><span class="examples">True False Nil</span></div>
+  <div class="token-row"><span class="swatch sw-type"></span><span class="label">type</span><span class="examples">Integer String Double…</span></div>
+  <div class="token-row"><span class="swatch sw-builtin"></span><span class="label">builtin</span><span class="examples">Self Super Me</span></div>
+  <div class="token-row"><span class="swatch sw-comment"></span><span class="label">comment</span><span class="examples">// line  ' apostrophe</span></div>
+  <div class="token-row"><span class="swatch sw-string"></span><span class="label">string</span><span class="examples">"double quoted"</span></div>
+  <div class="token-row"><span class="swatch sw-number"></span><span class="label">number</span><span class="examples">42  3.14  &amp;hFF  &amp;b1010</span></div>
+  <div class="token-row"><span class="swatch sw-meta"></span><span class="label">meta</span><span class="examples">#pragma #tag #if #endif</span></div>
+</div>
+
+<h2>Usage</h2>
+<div class="usage-block">
+  <p>1. Browser — direct CDN imports (no import map needed):</p>
+  <pre>&lt;script type="module"&gt;
+import { EditorView, basicSetup } from "https://esm.sh/codemirror@6"
+import { StreamLanguage }         from "https://esm.sh/@codemirror/language@6"
+import { xojoStreamParser }       from "./xojo.codemirror.js"
+
+new EditorView({
+  doc: sourceCode,
+  extensions: [
+    basicSetup,
+    StreamLanguage.define(xojoStreamParser),
+  ],
+  parent: document.querySelector('#editor'),
+})
+&lt;/script&gt;</pre>
+
+  <p>2. npm / bundler (Vite, Webpack, Rollup):</p>
+  <pre>import { EditorView, basicSetup } from "codemirror"
+import { StreamLanguage }         from "@codemirror/language"
+import { xojoStreamParser }       from "xojo-syntax-highlight/codemirror"
+
+// Same EditorView setup as above</pre>
+</div>
+
+<script type="module">
+  const loading = document.getElementById('loading');
+
+  try {
+    // All three packages share the same @codemirror/state instance because
+    // every import map entry uses the * prefix (external/bare-specifier mode).
+    const [
+      { EditorView, basicSetup },
+      { StreamLanguage },
+      { oneDark },
+      { xojoStreamParser },
+    ] = await Promise.all([
+      import('codemirror'),
+      import('@codemirror/language'),
+      import('@codemirror/theme-one-dark'),
+      import('../xojo.codemirror.js'),
+    ]);
+
+  const sampleCode =
+`// Fibonacci — Xojo syntax demo
+' Apostrophe comments work too
+
+#pragma DisableBackgroundTasks
+#tag Module, Name = MathUtils
+
+Function Fibonacci(n As Integer) As Integer
+  If n <= 1 Then Return n
+  Return Fibonacci(n - 1) + Fibonacci(n - 2)
+End Function
+
+#tag EndModule
+
+Class MyWindow
+  Inherits DesktopWindow
+
+  Property Title As String = "My App"
+
+  Sub Opening()
+    Var btn As New DesktopButton
+    btn.Caption = "Click Me"
+    btn.Left = 20
+    btn.Top = 20
+
+    Var mask  As Integer = &hFF00FF    // hex literal
+    Var flags As Integer = &b10101010  // binary literal
+    Var pi    As Double  = 3.14159
+
+    If mask = Nil Or flags = 0 Then
+      Raise New RuntimeException("Error")
+    End If
+
+    AddHandler btn.Pressed, AddressOf ButtonPressed
+  End Sub
+
+  Sub ButtonPressed(sender As DesktopButton)
+    Self.Title = "Clicked!"
+  End Sub
+
+End Class`;
+
+  const editorEl = document.getElementById('editor');
+
+  new EditorView({
+    doc: sampleCode,
+    extensions: [
+      basicSetup,
+      StreamLanguage.define(xojoStreamParser),
+      oneDark,
+    ],
+    parent: editorEl,
+  });
+
+  loading.style.display = 'none';
+  editorEl.style.display = 'block';
+
+  } catch (err) {
+    loading.textContent = `Failed to load CodeMirror: ${err.message}`;
+    loading.style.color = '#f85149';
+    console.error(err);
+  }
+</script>
+
+</body>
+</html>

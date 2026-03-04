@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:prismjs.com)",
+      "WebFetch(domain:highlightjs.readthedocs.io)",
+      "WebFetch(domain:github.com)",
+      "Bash(python3:*)",
+      "WebFetch(domain:codemirror.net)",
+      "WebFetch(domain:discuss.codemirror.net)",
+      "WebFetch(domain:lezer.codemirror.net)",
+      "WebFetch(domain:marijnhaverbeke.nl)",
+      "Bash(node:*)",
+      "Bash(curl:*)"
+    ]
+  }
+}
