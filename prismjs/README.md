@@ -89,7 +89,9 @@ python3 -m http.server 8000
 
 ## See Also
 
-- [highlight.js grammar](../highlightjs/) — companion grammar for highlight.js
+- [highlight.js grammar](../highlightjs/) — passive highlighting for static HTML
+- [CodeMirror 6 grammar](../codemirror/) — interactive editor with Xojo syntax
+- [Pygments lexer](../pygments/) — Python-based highlighting
 - [User Guide](userguide.md) — detailed integration guide
 
 ## License

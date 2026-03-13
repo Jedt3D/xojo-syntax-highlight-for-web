@@ -88,6 +88,7 @@ python3 -m http.server 8000
 
 - [highlight.js grammar](../highlightjs/) — passive highlighting for static HTML
 - [Prism.js grammar](../prismjs/) — passive highlighting for static HTML
+- [Pygments lexer](../pygments/) — Python-based highlighting
 - [User Guide](userguide.md) — detailed integration guide
 
 ## License

@@ -66,3 +66,9 @@ python3 pygments/demo/demo.py
 ```bash
 python3 pygments/test.py
 ```
+
+## See Also
+
+- [highlight.js grammar](../highlightjs/) — JS-based passive highlighting
+- [Prism.js grammar](../prismjs/) — JS-based passive highlighting
+- [CodeMirror 6 grammar](../codemirror/) — interactive editor with Xojo syntax

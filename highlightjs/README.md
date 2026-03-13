@@ -75,7 +75,9 @@ python3 -m http.server 8000
 
 ## See Also
 
-- [Prism.js grammar](../prismjs/) — companion grammar for Prism.js
+- [Prism.js grammar](../prismjs/) — passive highlighting for static HTML
+- [CodeMirror 6 grammar](../codemirror/) — interactive editor with Xojo syntax
+- [Pygments lexer](../pygments/) — Python-based highlighting
 - [User Guide](userguide.md) — detailed integration guide
 
 ## License
