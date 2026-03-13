@@ -44,6 +44,21 @@ Then open your browser and go to `http://localhost:8000/prismjs/demo/index.html`
    hljs.highlightAll();
    ```
 
+### Library 4: Pygments (Python)
+
+No install required — just copy `pygments/xojo.pygments.py` into your project.
+
+```bash
+# Highlight to HTML from command line
+python3 -m pygments -x -l pygments/xojo.pygments.py:XojoLexer yourfile.xojo_code \
+  -f html -O full,style=monokai -o output.html
+
+# Run demo
+python3 pygments/demo/demo.py
+```
+
+See `pygments/README.md` for full usage details.
+
 ### Library 2: Prism.js
 1. Install Prism.js:
    ```bash
